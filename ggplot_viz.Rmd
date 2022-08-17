@@ -17,10 +17,9 @@ library(gghighlight)
 library(paletteer)
 library(ggExtra)
 library(ggbeeswarm)
-
 library(gapminder)
 
-# library(sf)
+library(sf)
 
 ```
 
@@ -207,6 +206,59 @@ ggplot(data = lizards, aes(x = total_length, y = weight)) +
   geom_vline(xintercept = 250, linetype = "dashed", color = "orange", size = 4)
 
 ```
+
+
+```{r}
+
+wws_lizards <- lizards %>% 
+  filter(common_name == "western whiptail",
+         site == "sand")
+
+ggplot(data = wws_lizards, aes(x = total_length, y = weight)) +
+  geom_point() +
+  geom_text_repel(aes(label = toe_num))
+
+gapminder %>% 
+  filter(year == 2002, continent == "Europe") %>% 
+  ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  geom_text_repel(aes(label = country, size = 2.5), show.legend = FALSE)
+
+```
+
+```{r}
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point() +
+  gghighlight(toe_num == 250, label_key = toe_num)
+
+```
+
+
+```{r}
+# sf stands for simple features, which is a way to store spacial data where spatial data sticks to attributes
+
+jornada_veg <- read_sf(here("data_raw", "spatial_vegetation", "doc.kml"))
+
+ggplot() +
+  geom_sf(data = jornada_veg,
+          aes(fill = Name)) +
+  theme_minimal() +
+  scale_fill_paletteer_d(palette = "ggthemes::manyeys")
+
+
+  
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
