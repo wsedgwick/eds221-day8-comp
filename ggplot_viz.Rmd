@@ -1,0 +1,142 @@
+---
+title: "Data visualization"
+output: html_document
+date: '2022-08-17'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+
+library(patchwork)
+library(ggrepel)
+library(gghighlight)
+library(paletteer)
+library(ggExtra)
+library(ggbeeswarm)
+
+library(gapminder)
+
+# library(sf)
+
+```
+
+### Reach in date
+
+```{r}
+lizards <- read_csv(here::here("data_tidy", "lizards.csv"))
+
+```
+
+
+```{r}
+ggplot(data = lizards) +
+  geom_point(aes(x = total_length, y = weight))
+
+
+```
+
+
+### Histogram of total lengths for all lizards in the dataset
+
+```{r}
+
+ggplot(data = lizards, aes(x = total_length)) + 
+  geom_histogram(color = "orange",
+                 fill = "purple",
+                 size = 0.5,
+                 linetype = "dotted")
+
+```
+
+```{r}
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(
+    shape = 22,
+    color = "cyan4",
+    fill = "yellow",
+    size = 2,
+    alpha = 0.4
+  )
+```
+
+## Plotting based on variables with the aes()
+
+```{r}
+
+ggplot(data = lizards,
+       aes(x = total_length,
+           y = weight)) +
+  geom_point(aes(color = common_name,
+                 size = total_length),
+             alpha = 0.5) +
+  theme_minimal()
+
+```
+
+```{r}
+ggplot(data = lizards,
+       aes(x = total_length,
+           y = weight)) +
+  geom_point() +
+  facet_wrap(~common_name, scales = "free")
+```
+
+### Reordering
+
+# Find total count of lizards by name
+
+```{r}
+
+lizards_species_totals <- lizards %>% 
+  group_by(common_name) %>% 
+  summarise(count = n(),
+            mean_length = mean(total_length))
+
+lizards_species_totals <- lizards %>% 
+  count(common_name)
+
+# lizards__species_totals <- lizards %>% 
+#   count(common_name, site, tail)
+
+```
+
+## Horizontal graphing
+### Reordering!
+
+```{r}
+
+ggplot(data = lizards_species_totals, aes(y = fct_reorder(common_name, n),
+                                          x = n)) +
+  geom_col()
+
+
+```
+
+Create scatterplot, faceted by species, for total length vs weight. The color and shape of points should differ based on species (common_name). Change the theme. Make each faceted panel have flexible axes limits (scales should be free).
+
+
+```{r}
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = common_name,
+                 shape = common_name)) +
+  facet_wrap(~common_name, scales = "free") +
+  theme_minimal() +
+  labs(x = "Total length (in mm)",
+       y = "Weight (in grams)",
+       title = "Jornada Basin lizard sizes",
+       subtitle = "All lizards follow the standard length-weight relationship, with western whiptails being largest",
+       caption = "Data: Jornada Basin LTER, CCBY")
+
+```
+
+
+
+
+
+
+
