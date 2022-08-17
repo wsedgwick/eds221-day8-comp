@@ -134,8 +134,79 @@ ggplot(data = lizards, aes(x = total_length, y = weight)) +
 
 ```
 
+### Fun with scales
+
+```{r}
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = weight)) +
+  scale_color_gradient(low = "purple",
+                       high = "orange")
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = weight)) +
+  scale_color_gradientn(colors = c("magenta", "cyan4", "darkorchid3", "dodgerblue", "green", "yellow"))
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = weight)) +
+  scale_color_steps(low = "red", high = "black")
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = total_length)) +
+  scale_color_steps2(low = "purple",
+                     mid = "white",
+                     high = "orange",
+                     midpoint = 150,
+                     breaks = c(50, 75, 150, 180, 220, 280))
 
 
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = total_length)) +
+  scale_color_stepsn(colors = c("orange", "red", "purple"),
+                     breaks = seq(from = 0, to = 400, by = 80))
+
+```
+
+# Paletteer
+
+Make a horizontal box plot with common name on y-axis, total length on x-axis, with boxplot fill changing based on the common name
+
+```{r}
+lizards_median <- lizards %>% 
+  mutate(common_name = fct_reorder(common_name, total_length, .fun = median))
+
+# Creating a new column which overwrites existing column, recast common name as a factor not char, then reorders them according to the median of total length for each of the different levels of species by common_name (factor levels)
+
+ggplot(data = lizards, aes(y = common_name, x = total_length)) +
+  geom_boxplot(aes(fill = common_name))
+
+ggplot(data = lizards_median, aes(y = common_name, x = total_length)) +
+  geom_boxplot(aes(fill = common_name), show.legend = FALSE) +
+  scale_fill_paletteer_d(palette = "ggsci::default_gsea") +
+  theme_minimal()
+
+ggplot(data = lizards_median, aes(y = common_name, x = total_length)) +
+  geom_boxplot(aes(fill = common_name), show.legend = FALSE) +
+  scale_fill_paletteer_d(palette = "palettetown::pikachu") +
+  theme_minimal()
+
+```
+
+```{r}
+
+ggplot(data = lizards, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = weight)) +
+  theme(panel.grid.major.x = element_line(color = "red"),
+        panel.grid.minor.x = element_line(color = "gold"),
+        axis.title.x = element_text(color = "peachpuff"),
+        axis.text.x = element_text(color = "cyan4"),
+        text = element_text(size = 18),
+        panel.background = element_rect(color = "gold",
+                                        fill = "peachpuff")) +
+  annotate("text", x = 300, y = 50, label = "Woooooo", color = "blue") +
+  geom_vline(xintercept = 250, linetype = "dashed", color = "orange", size = 4)
+
+```
 
 
 
