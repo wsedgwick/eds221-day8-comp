@@ -1,0 +1,103 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-08-19'
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+
+library(patchwork)
+library(ggrepel)
+library(gghighlight)
+library(paletteer)
+library(ggExtra)
+library(ggbeeswarm)
+library(gapminder)
+library(sf)
+library(lubridate)
+
+```
+
+### Make a heatmap
+
+```{r}
+lizards <- read_csv(here::here("data_tidy", "lizards.csv"))
+
+lizard_counts <- lizards %>% 
+  mutate(date = lubridate::mdy(date)) %>% 
+  count(year = lubridate::year(date), common_name) %>% 
+  drop_na()
+
+```
+
+
+```{r}
+heatmap <- ggplot(data = lizard_counts, aes(x = year, y = common_name)) +
+  geom_tile(aes(fill = n), show.legend = FALSE) +
+  geom_text(aes(label = n), color = "white", size = 3) +
+  scale_fill_gradientn(colors = c("navy", "red", "orange"))
+
+#scale_fill_gradientn - can tell the code how many colors to use
+
+```
+
+### Beeswarm plot
+
+```{r}
+
+whiptails <- lizards %>% 
+  filter(common_name == "western whiptail") %>% 
+  drop_na(total_length, weight)
+
+```
+
+
+```{r}
+whiptail_bee <- ggplot(data = whiptails, aes(x = sex, y = weight)) +
+  geom_beeswarm() +
+  geom_boxplot(alpha = 0.2)
+
+# more accurate than a jitter plot but doesn't make assumptions like a violin plot would
+```
+
+
+### Marginal plot
+
+- Starting from whiptails, plot total length (x-axis) versus weight (y-axis), with point color depenent on sex.
+
+```{r}
+
+whiptail_plot <- ggplot(data = whiptails, aes(x = total_length, y = weight)) +
+  geom_point(aes(color = sex)) +
+  theme(legend.position = "bottom")
+
+ggMarginal(whiptail_plot, type = "boxplot", groupColour = TRUE)
+
+
+```
+### Patchwork
+
+```{r}
+((whiptail_bee + whiptail_plot) / whiptail_bee) & theme_dark()
+
+# with &, able to add themes and colors to all plots!
+
+
+```
+
+
+
+
+
+
+
+
+
+
